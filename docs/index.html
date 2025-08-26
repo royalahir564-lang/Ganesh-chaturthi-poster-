@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Festival Poster Maker</title>
+
+  <!-- Stylish font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    canvas {
+      border: 2px solid #333;
+      border-radius: 10px;
+      margin-top: 15px;
+      max-width: 100%;
+      height: auto;
+    }
+    input, button {
+      margin: 10px;
+      padding: 8px 14px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+    button {
+      cursor: pointer;
+      background: #007b5e;
+      color: white;
+      border: none;
+    }
+    button:hover {
+      background: #005f47;
+    }
+  </style>
+</head>
+<body>
+  <h2>🙏 Ganesh Chaturthi Poster Maker 🙏</h2>
+  
+  <!-- Image Upload -->
+  <input type="file" id="photoInput" accept="image/*"><br>
+  
+  <!-- Name Input -->
+  <input type="text" id="nameInput" placeholder="Enter your name"><br>
+  
+  <!-- Buttons -->
+  <button onclick="generatePoster()">Generate Poster</button>
+  <button onclick="downloadPoster()">Download Poster</button>
+  
+  <br>
+  <!-- Canvas -->
+  <canvas id="posterCanvas" width="600" height="800"></canvas>
+  
+  <script>
+    const canvas = document.getElementById("posterCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Background template (Ganesh Poster)
+    const template = new Image();
+    template.src = "ganesh.png"; // background fix rahega
+
+    let userImage = null;
+
+    // Upload photo
+    document.getElementById("photoInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        userImage = new Image();
+        userImage.src = event.target.result;
+        userImage.onload = () => generatePoster();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function generatePoster() {
+      const name = document.getElementById("nameInput").value;
+
+      // Draw background template
+      ctx.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+      // --- FIXED POSITION FOR USER PHOTO (White Square in Template) ---
+      const photoX = 40;     // adjust based on white square position
+      const photoY = 640;    // adjust based on white square position
+      const photoW = 120;    // white square width
+      const photoH = 120;    // white square height
+
+      if (userImage) {
+        ctx.fillStyle = "#fff"; // white background for frame
+        ctx.fillRect(photoX, photoY, photoW, photoH);
+        ctx.drawImage(userImage, photoX, photoY, photoW, photoH);
+      }
+
+      // --- NAME AREA (inside dark green rectangle after शुभेच्छुक:) ---
+      if (name) {
+        const rectX = 240, rectY = 670, rectW = 320, rectH = 50;
+
+        // Dark green rectangle
+        ctx.fillStyle = "#004d26";
+        ctx.fillRect(rectX, rectY, rectW, rectH);
+
+        // White bold stylish font text
+        ctx.font = "bold 24px 'Poppins', sans-serif";
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(name, rectX + rectW / 2, rectY + rectH / 2);
+      }
+    }
+
+    function downloadPoster() {
+      const link = document.createElement("a");
+      link.download = "GaneshPoster.png";
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+
+    // On background load, render once
+    template.onload = () => generatePoster();
+  </script>
+</body>
+</html>
